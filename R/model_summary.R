@@ -73,7 +73,7 @@ model_summary <- function(model,
     ## lmer package
   } else if (class(model)[1] == "lmerModLmerTest" | class(model)[1] == "lmerMod") {
     model_type <- "Linear Mixed Effect Model (fitted using lme4 or lmerTest)"
-    formula_attribute <- stats::terms(model@call$formula)
+    formula_attribute <- stats::terms(insight::find_formula(model)$conditional)
     DV <- as.character(attributes(formula_attribute)$variables)[2]
     IV <- attributes(formula_attribute)$term.labels
     IV <- IV[!stringr::str_detect(IV, "\\+")]
@@ -338,7 +338,7 @@ model_summary <- function(model,
   # Check assumption plot
   if (assumption_plot == TRUE) {
     if (all(unlist(lapply(c("gridExtra", "qqplotr", "see"), requireNamespace)))) {
-      tryCatch(
+      assumption_plot <- tryCatch(
         {
           assumption_plot <- suppressMessages(performance::check_model(model))
           print(assumption_plot)
@@ -346,6 +346,7 @@ model_summary <- function(model,
         error = function(cond) {
           warning("assumption_plot does not support this model type")
           warning(cond)
+          return(NULL)
         }
       )
     } else {

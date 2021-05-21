@@ -1,3 +1,7 @@
+# psycModel 0.3.1
+**Minor Feature:** <br/>
+* Patch release due to `insight` upgrade from v0.13.2 to v0.14.0
+
 # psycModel 0.3.0
 
 **Major Feature:** <br/>
