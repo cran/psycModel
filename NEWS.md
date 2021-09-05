@@ -1,8 +1,12 @@
-# psycModel 0.3.1
-**Minor Feature:** <br/>
-* Patch release due to `insight` upgrade from v0.13.2 to v0.14.0
+# psycModel 0.3.2
 
-# psycModel 0.3.0
+# psycModel 0.3.1
+
+Bugs fixed: 
+
+* Fixed bugs that measurement invariance does not have row name.
+
+# psycModel 0.3.0 (first CRAN release)
 
 **Major Feature:** <br/>
 * Support reliability measure summary

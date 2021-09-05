@@ -33,24 +33,16 @@
 #' @export
 #' @examples
 #' # REMEMBER, YOU MUST NAMED ALL ARGUMENT EXCEPT THE CFA ITEMS ARGUMENT
-#' # Fitting a multiple factor CFA model
+#' # Fitting a multilevel single factor CFA model
 #' fit <- cfa_summary(
 #'   data = lavaan::HolzingerSwineford1939,
 #'   x1:x3,
 #'   x4:x6,
 #'   x7:x9,
-#' )
-#'
-#' # Fitting a multilevel single factor CFA model
-#' \donttest{
-#' fit <- cfa_summary(
-#'   data = lavaan::HolzingerSwineford1939,
-#'   x1:x3,
 #'   group = "sex",
 #'   model_variance = FALSE, # do not print the model_variance
 #'   model_covariance = FALSE # do not print the model_covariance
 #' )
-#' }
 #'
 #'
 #' # Fitting a CFA model by passing explicit lavaan model (equivalent to the above model)
@@ -107,8 +99,7 @@ cfa_summary <- function(data,
   if (length(group) == 0) {
     group <- NULL
   }
-
-
+  
   cfa_model <- lavaan::cfa(
     model = model,
     data = data,
@@ -149,10 +140,10 @@ cfa_summary <- function(data,
       dplyr::rename(P = "pvalue") %>%
       dplyr::mutate(dplyr::across(where(is.numeric), ~ format_round(x = ., digits = 3)))
 
-    if (is.null(group)) {
+    if (is.null(group)) { # no group variable
       factors_loadings_df <- factors_loadings_df %>%
         dplyr::mutate(dplyr::across(.data$Latent.Factor, ~ replace(., duplicated(.), "")))
-    } else {
+    } else { # yes group variable
       factors_loadings_df <- factors_loadings_df %>%
         dplyr::mutate(group = as.integer(group)) %>%
         dplyr::group_by(group) %>%
@@ -193,10 +184,14 @@ cfa_summary <- function(data,
       }
       super_print("Model Formula = \n.{model}")
     }
-    super_print("underline|Fit Measure")
-    print_table(fit_measure_df)
+    if (nrow(factors_loadings_df) > 3) {
+      super_print("underline|Fit Measure")
+      print_table(fit_measure_df) 
+      cat("\n \n")
+    } else{
+      message('Fit measure is not printed due to factor <= 3 ')
+    }
 
-    cat("\n \n")
     super_print("underline|Factor Loadings")
     print_table(factors_loadings_df)
 
@@ -214,59 +209,61 @@ cfa_summary <- function(data,
       }
     }
     ########################################## Goodness of Fit ###################################################
-    if (ordered == FALSE) {
-      cat("\n \n")
-      super_print("Goodness of Fit:")
-      P <- fit_measure_df["P"]
-      if (P >= 0.05 & !is.na(P)) {
-        super_print("green| OK. Excellent $chi$^2 fit (p > 0.05)")
-      } else if (P < 0.05 & !is.na(P)) {
-        super_print("yellow| Warning. Poor $chi$^2 fit (p < 0.05). It is common to get p < 0.05. Check other fit measure.")
-      }
+    if (nrow(factors_loadings_df) > 3) {
+      if (ordered == FALSE) {
+        cat("\n \n")
+        super_print("Goodness of Fit:")
+        P <- fit_measure_df["P"]
+        if (P >= 0.05 & !is.na(P)) {
+          super_print("green| OK. Excellent $chi$^2 fit (p > 0.05)")
+        } else if (P < 0.05 & !is.na(P)) {
+          super_print("yellow| Warning. Poor $chi$^2 fit (p < 0.05). It is common to get p < 0.05. Check other fit measure.")
+        }
 
-      CFI <- fit_measure_df["CFI"]
-      if (CFI >= 0.95) {
-        super_print("green| OK. Excellent CFI fit (CFI > 0.95)")
-      } else if (CFI >= 0.9) {
-        super_print("green| OK. Acceptable CFI fit (CFI > 0.90)")
-      } else if (CFI < 0.9) {
-        super_print("red| Warning. Poor CFI fit (CFI < 0.90)")
-      }
+        CFI <- fit_measure_df["CFI"]
+        if (CFI >= 0.95) {
+          super_print("green| OK. Excellent CFI fit (CFI > 0.95)")
+        } else if (CFI >= 0.9) {
+          super_print("green| OK. Acceptable CFI fit (CFI > 0.90)")
+        } else if (CFI < 0.9) {
+          super_print("red| Warning. Poor CFI fit (CFI < 0.90)")
+        }
 
-      RMSEA <- fit_measure_df["RMSEA"]
-      if (RMSEA <= 0.05) {
-        super_print("green| OK. Excellent RMSEA fit (RMSEA < 0.05)")
-      } else if (RMSEA <= 0.08) {
-        super_print("green| OK. Acceptable RMSEA fit (RMSEA < 0.08)")
-      } else if (RMSEA > 0.08) {
-        super_print("red| Warning. Poor RMSEA fit (RMSEA > 0.08)")
-      }
+        RMSEA <- fit_measure_df["RMSEA"]
+        if (RMSEA <= 0.05) {
+          super_print("green| OK. Excellent RMSEA fit (RMSEA < 0.05)")
+        } else if (RMSEA <= 0.08) {
+          super_print("green| OK. Acceptable RMSEA fit (RMSEA < 0.08)")
+        } else if (RMSEA > 0.08) {
+          super_print("red| Warning. Poor RMSEA fit (RMSEA > 0.08)")
+        }
 
-      SRMR <- fit_measure_df["SRMR"]
-      if (SRMR <= 0.08) {
-        super_print("green| OK. Good SRMR fit (SRMR < 0.08)")
-      } else if (SRMR > 0.08) {
-        super_print("red| Warning. Poor SRMR fit (SRMR > 0.08)")
-      }
+        SRMR <- fit_measure_df["SRMR"]
+        if (SRMR <= 0.08) {
+          super_print("green| OK. Good SRMR fit (SRMR < 0.08)")
+        } else if (SRMR > 0.08) {
+          super_print("red| Warning. Poor SRMR fit (SRMR > 0.08)")
+        }
 
-      TLI <- fit_measure_df["TLI"]
-      if (TLI >= 0.95) {
-        super_print("green| OK. Excellent TLI fit (TLI > 0.95)")
-      } else if (TLI >= 0.9) {
-        super_print("green| OK. Acceptable TLI fit (TLI > 0.90)")
-      } else if (TLI < 0.9) {
-        super_print("red| Warning. Poor TLI fit (TLI < 0.90)")
-      }
+        TLI <- fit_measure_df["TLI"]
+        if (TLI >= 0.95) {
+          super_print("green| OK. Excellent TLI fit (TLI > 0.95)")
+        } else if (TLI >= 0.9) {
+          super_print("green| OK. Acceptable TLI fit (TLI > 0.90)")
+        } else if (TLI < 0.9) {
+          super_print("red| Warning. Poor TLI fit (TLI < 0.90)")
+        }
 
-      if (all(factors_loadings_df$Std.Est >= 0.7)) {
-        super_print("green| OK. Excellent factor loadings (all loadings > 0.7)")
-      } else if (any(factors_loadings_df$Std.Est < 0.7) & all(factors_loadings_df$Std.Est >= 0.4)) {
-        super_print("yellow| OK. Barely acceptable factor loadings (0.4 < some loadings < 0.7)")
-      } else if (any(factors_loadings_df$Std.Est < 0.4)) {
-        super_print("red| Warning. Some poor factor loadings (some loadings < 0.4)")
+        if (all(factors_loadings_df$Std.Est >= 0.7)) {
+          super_print("green| OK. Excellent factor loadings (all loadings > 0.7)")
+        } else if (any(factors_loadings_df$Std.Est < 0.7) & all(factors_loadings_df$Std.Est >= 0.4)) {
+          super_print("yellow| OK. Barely acceptable factor loadings (0.4 < some loadings < 0.7)")
+        } else if (any(factors_loadings_df$Std.Est < 0.4)) {
+          super_print("red| Warning. Some poor factor loadings (some loadings < 0.4)")
+        }
+      } else {
+        print("No recommended cut-off criteria is avaliable for CFA fitted using DWLS (non-continuous variable). See ?cfa_summary details.")
       }
-    } else {
-      print("No recommended cut-off criteria is avaliable for CFA fitted using DWLS (non-continuous variable). See ?cfa_summary details.")
     }
   } # quite == FALSE
   if (plot == TRUE) {

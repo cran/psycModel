@@ -3,7 +3,7 @@
 #' `r lifecycle::badge("stable")` \cr
 #' Compare the fit indices of models (see below for model support)
 #'
-#' @param ... model. If it is a `lavaan` object, it will try to compute the measurement invariance. Other model types will be passed to `performance::compare_performance()`. 
+#' @param ... model. If it is a `lavaan` object, it will try to compute the measurement invariance. Other model types will be passed to `performance::compare_performance()`.
 #' @param digits number of digits to round to
 #' @param streamline print streamlined output
 #' @param quite suppress printing output
@@ -80,14 +80,14 @@ compare_fit <- function(...,
 
     ## lme & glme models
   } else {
-    output_table <- performance::compare_performance(...)
+    output_table <- "compare_fit is temporialy disable due to unknown error caused by insight upgrade from 0.13.2 to 0.14.0. Follow instruction on the package load message to get back all the features."
     if (quite == FALSE) {
       if (streamline == FALSE) {
         super_print("underline|Model Summary")
         super_print("Model Type = Model Comparison")
         cat("\n")
       }
-      output_table <- output_table %>% dplyr::select(-1)
+      # output_table <- output_table %>% dplyr::select(-1)
       print_table(output_table)
     }
     if (return_result == TRUE) {

@@ -39,44 +39,29 @@ three_way_interaction_plot <- function(model,
                                        graph_label_name = NULL,
                                        y_lim = NULL,
                                        plot_color = FALSE) {
-  interaction_plot_check <- function(interaction_term) {
-    if (length(interaction_term) > 1) {
-      interaction_term <- interaction_term[1]
-      warning(paste("Inputted > 2 interaction terms. Plotting the first interaction term:\n ", interaction_term))
-    }
-    return(interaction_term)
-  }
-
   model_data <- NULL
-
-  # get attributes based on model
-  if (class(model) == "lme") {
-    formula_attribute <- model$terms
+  if (any(class(model) %in% c("lmerMod", "lmerModLmerTest", "lm", "lme"))) {
     model_data <- insight::get_data(model)
-    predict_var <- attributes(formula_attribute)$term.labels
-    response_var <- as.character(attributes(formula_attribute)$variables)[2]
-    interaction_term <- predict_var[stringr::str_detect(predict_var, ":.+:")]
-    interaction_term <- interaction_plot_check(interaction_term)
-  } else if (any(class(model) %in% c("lmerMod", "lmerModLmerTest"))) {
-    formula_attribute <- stats::terms(insight::find_formula(model)$conditional)
-    model_data <- insight::get_data(model)
-    predict_var <- attributes(formula_attribute)$term.labels
-    response_var <- as.character(attributes(formula_attribute)$variables)[2]
-    interaction_term <- predict_var[stringr::str_detect(predict_var, ":.+:")]
-    interaction_term <- interaction_plot_check(interaction_term)
-  } else if (class(model) == "lm") {
-    tryCatch(data <- eval(stats::getCall(model)$data, environment(stats::formula(model))), error = function(cond) {
-      warning("Unable to extract data. Please pass the data directly as an arugment and ignore this warning")
-    })
-    predict_var <- as.character(attributes(model$terms)$term.labels)
-    response_var <- predict_var[2]
-    interaction_term <- predict_var[stringr::str_detect(predict_var, ":.+:")]
-    interaction_term <- interaction_plot_check(interaction_term)
+    predict_var <- model %>%
+      insight::find_predictors() %>%
+      .$conditional # maybe problem with unconditional?
+    response_var <- model %>% insight::find_response()
+    interaction_term <- model %>%
+      insight::find_interactions() %>%
+      .$conditional
   }
   else {
-    stop("It only support model object from nlme, lme4, and lmerTest")
+    model_data <- insight::get_data(model)
+    predict_var <- model %>%
+      insight::find_predictors() %>%
+      .$conditional # maybe problem with unconditional?
+    response_var <- model %>% insight::find_response()
+    interaction_term <- model %>%
+      insight::find_interactions() %>%
+      .$conditional
+    warning("Only models from lm, nlme, lme4, and lmerTest are tested")
   }
-
+  interaction_term <- interaction_term[stringr::str_detect(":.+:", string = interaction_term)]
   predict_var1 <- gsub(pattern = ":.+", "", x = interaction_term)
   predict_var3 <- gsub(pattern = ".+:", "", x = interaction_term)
   remove1 <- stringr::str_remove(pattern = predict_var1, string = interaction_term)
