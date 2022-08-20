@@ -6,7 +6,7 @@ old.hooks <- fansi::set_knit_hooks(knitr::knit_hooks)
 library(psycModel)
 
 ## ----fig.width=14, fig.height=8,out.width=700,out.height=400------------------
-integrated_model_summary(
+lm_model_summary(
    data = iris,
    response_variable = Sepal.Length,
    predictor_variable = tidyselect::everything(),
@@ -19,7 +19,7 @@ integrated_model_summary(
  )
 
 ## ----fig.width=14,fig.height=8,out.width=700,out.height=400-------------------
-integrated_multilevel_model_summary(
+lme_multilevel_model_summary(
     data = popular,
     response_variable = popular,
     random_effect_factors = extrav,

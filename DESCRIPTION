@@ -1,7 +1,7 @@
 Type: Package
 Package: psycModel
 Title: Integrated Toolkit for Psychological Analysis and Modeling in R
-Version: 0.3.2
+Version: 0.3.3
 Authors@R: 
     person(given = "Jason",
            family = "Moy",
@@ -20,16 +20,17 @@ Imports: dplyr, ggplot2, glue, insight, lavaan, lifecycle, lme4,
         0.1.2), stringr, tibble, tidyr, utils
 Suggests: correlation, covr, cowplot, fansi, ggrepel, GPArotation,
         gridExtra, interactions, knitr, nFactors, nlme, pagedown,
-        qqplotr, rmarkdown, roxygen2, sandwich, see, semPlot, testthat
-        (>= 3.0.0), tidyselect
+        qqplotr, rmarkdown, roxygen2, sandwich, see, semPlot, spelling,
+        testthat (>= 3.0.0), tidyselect
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0
+Language: en-US
 NeedsCompilation: no
-Packaged: 2021-09-05 04:08:10 UTC; Jasonmoy
+Packaged: 2022-08-20 17:44:00 UTC; Jasonmoy
 Author: Jason Moy [aut, cre] (<https://orcid.org/0000-0001-8795-3311>)
 Maintainer: Jason Moy <jasonmoy28@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-09-05 05:00:02 UTC
+Date/Publication: 2022-08-20 18:00:02 UTC

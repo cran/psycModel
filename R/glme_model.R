@@ -18,15 +18,7 @@
 #' @param model `lme4` model syntax. Support more complicated model. Note that model_summary will only return fixed effect estimates. This is not tested. `r lifecycle::badge("experimental")`
 #'
 #' @return An object of class `glmerMod` representing the linear mixed-effects model fit.
-#' @export
-#' @examples
-#' fit <- glme_model(
-#'   response_variable = incidence,
-#'   random_effect_factors = period,
-#'   family = "poisson", # or you can enter as poisson(link = 'log')
-#'   id = herd,
-#'   data = lme4::cbpp
-#' )
+#' 
 glme_model <- function(data,
                        model = NULL,
                        response_variable,
@@ -41,7 +33,6 @@ glme_model <- function(data,
                        na.action = stats::na.omit,
                        quite = FALSE) {
   ########################################## Set up #############################################
-  data <- data_check(data) # check data and coerced into numeric
   glme_model_check <- function(object, method) {
     if (method == "response_variable_check") {
       if (length(object) != 1) {

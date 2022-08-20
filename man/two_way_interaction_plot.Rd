@@ -38,38 +38,9 @@ I recommend using concurrently with \code{lm_model} or \code{lme_model}.
 It appears that ``predict` cannot handle categorical factors. All variables are converted to numeric before plotting.
 }
 \examples{
-# If you pass the model directly, it can't extract the data-frame from fit object
-# Therefore, for now, you must pass the data frame to the function.
-# You don't need pass the data if you use `lm_model` or `lme_model`.
-
-# lme example
-lme_fit <- lme4::lmer("popular ~ extrav*texp + (1 + extrav | class)",
-  data = popular
-)
-
-two_way_interaction_plot(lme_fit,
-  graph_label_name = c("popular", "extraversion", "teacher experience"),
-  data = popular
-)
-
 lm_fit <- lm(Sepal.Length ~ Sepal.Width * Petal.Width,
   data = iris
 )
-
 two_way_interaction_plot(lm_fit, data = iris)
 
-# For more advanced users
-label_name <- function(var_name) {
-  var_name_processed <- switch(var_name,
-    "extrav" = "Extroversion",
-    "texp" = "Teacher Experience",
-    "popular" = "popular"
-  )
-  if (is.null(var_name_processed)) {
-    var_name_processed <- var_name
-  }
-  return(var_name_processed)
-}
-
-two_way_interaction_plot(lme_fit, data = popular, graph_label_name = label_name)
 }

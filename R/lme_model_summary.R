@@ -1,4 +1,4 @@
-#' Integrated Function for Mixed Effect Model
+#' Model Summary for Mixed Effect Model
 #'
 #' `r lifecycle::badge("stable")` \cr
 #' It will first compute the mixed effect model. It will use either the `nlme::lme` or the `lmerTest::lmer` for linear mixed effect model. It will use `lme4::glmer` for generalized linear mixed effect model.
@@ -35,7 +35,7 @@
 #' @export
 #'
 #' @examples
-#' fit <- integrated_multilevel_model_summary(
+#' fit <- lme_multilevel_model_summary(
 #'   data = popular,
 #'   response_variable = popular,
 #'   random_effect_factors = c(extrav),
@@ -45,7 +45,7 @@
 #'   id = class
 #' )
 #' \donttest{
-#' fit <- integrated_multilevel_model_summary(
+#' fit <- lme_multilevel_model_summary(
 #'   data = popular,
 #'   response_variable = popular,
 #'   random_effect_factors = c(extrav, sex),
@@ -59,43 +59,40 @@
 #' )
 #' }
 #'
-integrated_multilevel_model_summary <- function(data,
-                                                model = NULL,
-                                                response_variable = NULL,
-                                                random_effect_factors = NULL,
-                                                non_random_effect_factors = NULL,
-                                                two_way_interaction_factor = NULL,
-                                                three_way_interaction_factor = NULL,
-                                                family = NULL,
-                                                cateogrical_var = NULL,
-                                                id = NULL,
-                                                graph_label_name = NULL,
-                                                estimation_method = "REML",
-                                                opt_control = "bobyqa",
-                                                na.action = stats::na.omit,
-                                                model_summary = TRUE,
-                                                interaction_plot = TRUE,
-                                                y_lim = NULL,
-                                                plot_color = FALSE,
-                                                digits = 3,
-                                                use_package = "lmerTest",
-                                                simple_slope = FALSE,
-                                                assumption_plot = FALSE,
-                                                quite = FALSE,
-                                                streamline = FALSE,
-                                                return_result = FALSE) {
-
+lme_multilevel_model_summary <- function(data,
+                                         model = NULL,
+                                         response_variable = NULL,
+                                         random_effect_factors = NULL,
+                                         non_random_effect_factors = NULL,
+                                         two_way_interaction_factor = NULL,
+                                         three_way_interaction_factor = NULL,
+                                         family = NULL,
+                                         cateogrical_var = NULL,
+                                         id = NULL,
+                                         graph_label_name = NULL,
+                                         estimation_method = "REML",
+                                         opt_control = "bobyqa",
+                                         na.action = stats::na.omit,
+                                         model_summary = TRUE,
+                                         interaction_plot = TRUE,
+                                         y_lim = NULL,
+                                         plot_color = FALSE,
+                                         digits = 3,
+                                         use_package = "lmerTest",
+                                         simple_slope = FALSE,
+                                         assumption_plot = FALSE,
+                                         quite = FALSE,
+                                         streamline = FALSE,
+                                         return_result = FALSE) {
   ##################################### Set up #########################################
   # Temporary disable plots for glmer object
-  data <- data_check(data) # check data and coerced into numeric
-
   if (simple_slope == TRUE) {
     if (use_package == "nlme") {
       warning("Switched use_package to lmerTest since you requested simple_slope")
       use_package <- "lmerTest"
     }
   }
-
+  
   response_variable <- data %>%
     dplyr::select(!!enquo(response_variable)) %>%
     names()
@@ -114,7 +111,7 @@ integrated_multilevel_model_summary <- function(data,
   id <- data %>%
     dplyr::select(!!enquo(id)) %>%
     names()
-
+  
   ##################################### Run Model #########################################
   if (is.null(family)) {
     model <- lme_model(
@@ -154,8 +151,8 @@ integrated_multilevel_model_summary <- function(data,
       quite = TRUE
     )
   }
-
-
+  
+  
   ############################### Generate Interaction Plots ###############################
   two_way_interaction_factor <- data %>%
     dplyr::select(!!enquo(two_way_interaction_factor)) %>%
@@ -164,7 +161,8 @@ integrated_multilevel_model_summary <- function(data,
     dplyr::select(!!enquo(three_way_interaction_factor)) %>%
     names()
   interaction_plot_object <- NULL
-  if (length(two_way_interaction_factor) != 0 & (interaction_plot == TRUE | return_result == TRUE)) {
+  if (length(two_way_interaction_factor) != 0 &
+      (interaction_plot == TRUE | return_result == TRUE)) {
     interaction_plot_object <- two_way_interaction_plot(
       model = model,
       cateogrical_var = cateogrical_var,
@@ -172,7 +170,8 @@ integrated_multilevel_model_summary <- function(data,
       y_lim = y_lim,
       plot_color = plot_color
     )
-  } else if (length(three_way_interaction_factor) != 0 & (interaction_plot == TRUE | return_result == TRUE)) {
+  } else if (length(three_way_interaction_factor) != 0 &
+             (interaction_plot == TRUE | return_result == TRUE)) {
     interaction_plot_object <- three_way_interaction_plot(
       model = model,
       cateogrical_var = cateogrical_var,
@@ -184,22 +183,17 @@ integrated_multilevel_model_summary <- function(data,
     interaction_plot_object <- NULL
     interaction_plot <- FALSE
   }
-
+  
   ############################### Generate Simple Slope Output ###############################
   if (simple_slope == TRUE) {
     simple_slope_list <- simple_slope(
       data = data,
-      model = model,
-      two_way_interaction_factor = two_way_interaction_factor,
-      three_way_interaction_factor = three_way_interaction_factor
-    )
+      model = model)
   } else {
-    simple_slope_list <- list(
-      simple_slope_df = NULL,
-      jn_plot = NULL
-    )
+    simple_slope_list <- list(simple_slope_df = NULL,
+                              jn_plot = NULL)
   }
-
+  
   ######################################### Output Result  #########################################
   if (model_summary == TRUE) {
     model_summary_list <- model_summary(
@@ -213,15 +207,17 @@ integrated_multilevel_model_summary <- function(data,
   } else {
     model_summary_list <- NULL
   }
-
-
+  
+  
   if (simple_slope == TRUE & quite == FALSE) {
     super_print("underline|Slope Estimates at Each Level of Moderators")
     print_table(simple_slope_list$simple_slope_df)
-    super_print("italic|Note: For continuous variable, low and high represent -1 and +1 SD from the mean, respectively.")
+    super_print(
+      "italic|Note: For continuous variable, low and high represent -1 and +1 SD from the mean, respectively."
+    )
     print(simple_slope_list$jn_plot)
   }
-
+  
   if (interaction_plot == TRUE) {
     try(print(interaction_plot_object))
   }
@@ -229,9 +225,11 @@ integrated_multilevel_model_summary <- function(data,
   plot_logical <- c(interaction_plot, simple_slope, assumption_plot)
   number_of_plot_requested <- length(plot_logical[plot_logical])
   if (number_of_plot_requested > 1) {
-    warning("You requested > 2 plots. Since 1 plot can be displayed at a time, considering using Rmd for better viewing experience.")
+    warning(
+      "You requested > 2 plots. Since 1 plot can be displayed at a time, considering using Rmd for better viewing experience."
+    )
   }
-
+  
   # Return Result
   if (return_result == TRUE) {
     return_list <- list(

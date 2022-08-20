@@ -37,20 +37,9 @@ The function creates a two-way interaction plot. It will creates a plot with ± 
 It appears that ``predict` cannot handle categorical factors. All variables are converted to numeric before plotting.
 }
 \examples{
-# I am going to show the more generic usage of this function
-# You can also use this package's built in function to fit the models
-# I recommend using the integrated_multilevel_model_summary to get everything
-
-# lme example
-lme_fit <- lme4::lmer("popular ~ extrav + sex + texp + extrav:sex:texp +
-(1 + extrav + sex | class)", data = popular)
-
-three_way_interaction_plot(lme_fit, data = popular)
-
-# lm example
-
 lm_fit <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width +
   Sepal.Width:Petal.Length:Petal.Width, data = iris)
 
 three_way_interaction_plot(lm_fit, data = iris)
+
 }
