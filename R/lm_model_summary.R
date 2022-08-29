@@ -1,10 +1,9 @@
 #' Model Summary for Linear Regression
 #'
 #' `r lifecycle::badge("stable")` \cr
-#' It will first compute the linear regression. Then, it will graph the interaction using the two_way_interaction_plot or the three_way_interaction_plot function.
-#' If you requested simple slope summary, it will calls the `interaction::sim_slopes()`
+#' An integrated function for fitting a linear regression model.
 #'
-#' @param data data frame
+#' @param data `data.frame`
 #' @param response_variable DV (i.e., outcome variable / response variable). Length of 1. Support `dplyr::select()` syntax.
 #' @param predictor_variable IV. Support `dplyr::select()` syntax.
 #' @param three_way_interaction_factor three-way interaction factor. You need to pass exactly 3 factors. Specifying three-way interaction factors automatically included all two-way interactions, so please do not specify the two_way_interaction_factor argument. Support `dplyr::select()` syntax.
@@ -31,19 +30,12 @@
 #'   data = iris,
 #'   response_variable = "Sepal.Length",
 #'   predictor_variable = tidyselect::everything(),
-#'   two_way_interaction_factor = c(Sepal.Width, Species)
-#' )
-#' \donttest{
-#' fit <- lm_model_summary(
-#'   data = iris,
-#'   response_variable = "Sepal.Length",
-#'   predictor_variable = tidyselect::everything(),
 #'   two_way_interaction_factor = c(Sepal.Width, Species),
-#'   simple_slope = TRUE, # you can request simple slope
-#'   assumption_plot = TRUE, # you can also request assumption plot
-#'   plot_color = TRUE # you can also request the plot in color
+#'   interaction_plot = FALSE, # you can also request the interaction plot
+#'   simple_slope = FALSE, # you can also request simple slope estimate 
+#'   assumption_plot = FALSE, # you can also request assumption plot
+#'   streamline = FALSE #you can change this to get the least amount of info
 #' )
-#' }
 lm_model_summary <- function(data,
                              response_variable = NULL,
                              predictor_variable = NULL,

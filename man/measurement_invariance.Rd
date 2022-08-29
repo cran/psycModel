@@ -19,7 +19,7 @@ measurement_invariance(
 )
 }
 \arguments{
-\item{data}{data frame}
+\item{data}{\code{data.frame}}
 
 \item{...}{CFA items. Multi-factor CFA items should be separated by comma (as different argument). See below for examples. Support \code{dplyr::select()} syntax.}
 
@@ -42,7 +42,7 @@ measurement_invariance(
 \item{return_result}{If it is set to \code{TRUE}, it will return a data frame of the fit measure summary}
 }
 \value{
-a data frame of the fit measure summary
+a \code{data.frame} of the fit measure summary
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}} \cr

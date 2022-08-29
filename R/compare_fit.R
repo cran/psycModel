@@ -9,7 +9,7 @@
 #' @param quite suppress printing output
 #' @param return_result  If it is set to `TRUE`, it will return the the compare fit data frame.
 #'
-#' @return data frame with fit indices and change in fit indices
+#' @return a `dataframe` with fit indices and change in fit indices
 #' @export
 #' @examples
 #' # lme model
@@ -80,14 +80,14 @@ compare_fit <- function(...,
 
     ## lme & glme models
   } else {
-    output_table <- "compare_fit is temporialy disable due to unknown error caused by insight upgrade from 0.13.2 to 0.14.0. Follow instruction on the package load message to get back all the features."
+    output_table <- performance::compare_performance(...)
     if (quite == FALSE) {
       if (streamline == FALSE) {
         super_print("underline|Model Summary")
         super_print("Model Type = Model Comparison")
         cat("\n")
       }
-      # output_table <- output_table %>% dplyr::select(-1)
+      output_table <- output_table %>% dplyr::select(-1)
       print_table(output_table)
     }
     if (return_result == TRUE) {

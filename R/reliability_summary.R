@@ -4,12 +4,12 @@
 #' consists of alpha, G6, single-factor CFA, and descriptive statistics result. If it is multi-dimensional, it will print a summary consist of alpha, G6, omega result. You can
 #' bypass this by specifying the dimensionality argument.
 #'
-#' @param data data frame
+#' @param data `data.frame`
 #' @param cols items for reliability analysis.  Support `dplyr::select()` syntax.
 #' @param descriptive_table Get descriptive statistics. Default is `TRUE`
 #' @param digits number of digits to round to
 #' @param dimensionality Specify the dimensionality. Either `uni` (uni-dimensionality) or `multi` (multi-dimensionality). Default is `NULL` that determines the dimensionality using EFA.
-#' @param return_result If it is set to `TRUE` (default is `FALSE`), it will return `psych::alpha` for unidimensional scale, and `psych::omega` for multidimensional scale.
+#' @param return_result If it is set to `TRUE` (default is `FALSE`), it will return `psych::alpha` for uni-dimensional scale, and `psych::omega` for multidimensional scale.
 #' @param streamline print streamlined output
 #' @param quite suppress printing output
 #'

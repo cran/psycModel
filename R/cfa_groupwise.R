@@ -13,7 +13,7 @@
 #' @details
 #' All argument must be explicitly specified. If not, all arguments will be treated as CFA items
 #'
-#' @return data frame with group-wise CFA result
+#' @return a `data.frame` with group-wise CFA result
 #'
 #' @export
 #' @examples
@@ -31,8 +31,10 @@ cfa_groupwise <- function(data,
                           group,
                           model = NULL,
                           ordered = FALSE) {
-  group <- enquo(group)
-  items <- enquos(...)
+  try({if(!rlang::is_symbol(group)) {group <- dplyr::sym(group)}},silent = TRUE)
+  group = dplyr::enquo(group)
+  
+  items <- dplyr::enquos(...)
 
   model <- ""
   index <- 1
@@ -53,7 +55,7 @@ cfa_groupwise <- function(data,
   return_df <- data.frame(group = NULL, cfi = NULL, rmsea = NULL, tli = NULL)
   for (i in groups) {
     cfa_data <- data %>%
-      dplyr::filter(dplyr::across(!!group) == i)
+      dplyr::filter(!!group == i)
     cfa_model_summary <- lavaan::cfa(model = model, data = cfa_data, ordered = ordered)
     cfa_model_summary <- as.data.frame(lavaan::fitmeasures(cfa_model_summary))
     summary_df <- data.frame(group = i, cfi = cfa_model_summary["cfi", ], rmsea = cfa_model_summary["rmsea", ], tli = cfa_model_summary["tli", ])

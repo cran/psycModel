@@ -1,11 +1,9 @@
 #' Model Summary for Mixed Effect Model
 #'
 #' `r lifecycle::badge("stable")` \cr
-#' It will first compute the mixed effect model. It will use either the `nlme::lme` or the `lmerTest::lmer` for linear mixed effect model. It will use `lme4::glmer` for generalized linear mixed effect model.
-#' Then, it will print the model summary and the panel of the plots that are useful for checking assumption (default is `FALSE`). If you requested the interaction plot (default is `TRUE`), it will graph the interaction (Currently only support `lme` model but not `glme`)
-#' If you requested simple slope summary, it will uses the `interaction::sim_slopes()` to generate the slope estimate at varying level of the moderator (see `?simple_slope` for more detail)
-#'
-#' @param data data frame
+#' An integrated function for fitting a multilevel linear regression (also known as hierarchical linear regression).
+#' 
+#' @param data `data.frame`
 #' @param model `lme4` model syntax. Support more complicated model structure from `lme4`. It is not well-tested to ensure accuracy `r lifecycle::badge("experimental")`
 #' @param response_variable DV (i.e., outcome variable / response variable). Length of 1. Support `dplyr::select()` syntax.
 #' @param random_effect_factors random effect factors (level-1 variable for HLM from a HLM perspective) Factors that need to estimate fixed effect and random effect (i.e., random slope / varying slope based on the id). Support `dplyr::select()` syntax.
@@ -38,26 +36,16 @@
 #' fit <- lme_multilevel_model_summary(
 #'   data = popular,
 #'   response_variable = popular,
-#'   random_effect_factors = c(extrav),
-#'   non_random_effect_factors = texp,
-#'   two_way_interaction_factor = c(extrav, texp),
-#'   graph_label_name = c("popular", "extraversion", "teacher experience"),
-#'   id = class
-#' )
-#' \donttest{
-#' fit <- lme_multilevel_model_summary(
-#'   data = popular,
-#'   response_variable = popular,
-#'   random_effect_factors = c(extrav, sex),
-#'   non_random_effect_factors = texp,
-#'   three_way_interaction_factor = c(extrav, sex, texp), # three-way interaction
-#'   graph_label_name = c("popular", "extraversion", "sex", "teacher experience"),
+#'   random_effect_factors = NULL, # you can add random effect predictors here 
+#'   non_random_effect_factors = c(extrav,texp),
+#'   two_way_interaction_factor = NULL, # you can add two-way interaction plot here 
+#'   graph_label_name = NULL, #you can also change graph lable name here
 #'   id = class,
-#'   simple_slope = TRUE, # you can request simple slope
-#'   assumption_plot = TRUE, # you can also request assumption plot
-#'   plot_color = TRUE # you can also request the plot in color
+#'   simple_slope = FALSE, # you can also request simple slope estimate 
+#'   assumption_plot = FALSE, # you can also request assumption plot
+#'   plot_color = FALSE, # you can also request the plot in color
+#'   streamline = FALSE # you can change this to get the least amount of info
 #' )
-#' }
 #'
 lme_multilevel_model_summary <- function(data,
                                          model = NULL,
