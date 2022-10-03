@@ -1,3 +1,11 @@
+# psycModel 0.4.1
+**Fixes**  
+* Fixed anova plot labelling issue with two-way interaction  
+* Fixed `model_summary` print lm model summary when glm model is specified  
+* Fixed `model summary` cannot handle `aov` models  
+* Fixed the `check_factorstructure` function to import from `performance` instead of `parameters` package  
+
+
 # psycModel 0.4.0
 **Major Feature**  
 * Added support for ANOVA plots (with continuous variable as moderator)  

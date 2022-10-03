@@ -1,14 +1,15 @@
-#' Cronbach alpha 
-#' `r lifecycle::badge("stable")` \cr
+#' Cronbach alpha  
 #' 
+#' `r lifecycle::badge("stable")` \cr
 #' Computing the Cronbach alphas for multiple factors.  
 #' 
 #' @param ... Items. Group each latent factors using c() with when computing Cronbach alpha for 2+ factors (see example below) 
 #' @param data `data.frame`. Must specify
 #' @param var_name character or a vector of characters. The order of `var_name` must be same as the order of the `...`
-#' @param return_result  If it is set to `TRUE`, it will return a `dataframe` object
 #' @param group optional character. Specify this argument for computing Cronbach alpha for group separetely  
-#'
+#' @param quite suppress printing output
+#' @param return_result  If it is set to `TRUE`, it will return a `dataframe` object
+#' 
 #' @return a `data.frame` object if return_result is `TRUE`
 #' @export
 #'
@@ -22,8 +23,9 @@
 cronbach_alpha = function(...,
                           data,
                           var_name,
-                          return_result = FALSE,
-                          group = NULL) {
+                          group = NULL,
+                          quite = FALSE,
+                          return_result = FALSE) {
   items = enquos(...)
   group <- data %>%
     dplyr::select(!!enquo(group)) %>%
@@ -65,14 +67,16 @@ cronbach_alpha = function(...,
     }
     return_df = return_df %>% dplyr::rename(!!group := group)
   }
-  cat("\n \n")
-  super_print("underline|Model Summary")
-  super_print("Model Type = Cronbach Alpha Reliability Analysis")
-  super_print("Model Specification: ")
-  super_print(item_print)
-  cat("\n")
-  print_table(return_df)
-  cat("\n")
+  if (isFALSE(quite)) {
+    cat("\n \n")
+    super_print("underline|Model Summary")
+    super_print("Model Type = Cronbach Alpha Reliability Analysis")
+    super_print("Model Specification: ")
+    super_print(item_print)
+    cat("\n")
+    print_table(return_df)
+    cat("\n") 
+  }
   if (return_result) {
     return(return_df)
   }

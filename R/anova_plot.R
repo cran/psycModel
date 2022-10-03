@@ -1,19 +1,36 @@
-#' ANOVA Plot
+#' ANOVA Plot  
 #'
 #' `r lifecycle::badge("experimental")` \cr
 #' Plot categorical variable with barplot. Continuous moderator are plotted at ± 1 SD from the mean. 
 #' 
-#' @param model fitted model (usually `lm` or `aov` object)
+#' @param model fitted model (usually `lm` or `aov` object). Variables must be converted to correct data type before fitting the model. Specifically,  continuous variables must be converted to type `numeric` and categorical variables to type `factor`. 
 #' @param predictor predictor variable. Must specified for non-interaction plot and must not specify for interaction plot. 
 #' @param graph_label_name vector or function. Vector should be passed in the form of `c(response_var, predict_var1, predict_var2, ...)`. Function should be passed as a switch function that return the label based on the name passed (e.g., a switch function)
 #'
-#' @return plot object
+#' @return a `ggplot` object
 #' @export
 #'
 #' @examples
-#' fit = iris %>% lm(data = ., Sepal.Length ~ Species)
-#' anova_plot(fit,predictor = Species)
+#' # Main effect plot with 1 categorical variable
+#' fit_1 = lavaan::HolzingerSwineford1939 %>% 
+#'   dplyr::mutate(school = as.factor(school)) %>% 
+#'   lm(data = ., grade ~ school)
+#' anova_plot(fit_1,predictor = school)
 #'
+#' # Interaction effect plot with 2 categorical variables 
+#' fit_2 = lavaan::HolzingerSwineford1939 %>% 
+#'   dplyr::mutate(dplyr::across(c(school,sex),as.factor)) %>% 
+#'   lm(data = ., grade ~ school*sex)
+#' anova_plot(fit_2)
+#' 
+#' # Interaction effect plot with 1 categorical variable and 1 continuous variable
+#' fit_3 = lavaan::HolzingerSwineford1939 %>% 
+#'   dplyr::mutate(school = as.factor(school)) %>% 
+#'   dplyr::mutate(ageyr = as.numeric(ageyr)) %>% 
+#'   lm(data = ., grade ~ ageyr*school)
+#' anova_plot(fit_3)
+#' 
+#' 
 anova_plot <- function(model,
                        predictor = NULL,
                        graph_label_name = NULL) {
@@ -21,7 +38,7 @@ anova_plot <- function(model,
   response_var_name = insight::find_response(model)
   response_var = dplyr::enquo(response_var_name)
   
-  data = insight::get_data(x = model)
+  data = insight::get_data(x = model) %>% dplyr::mutate(dplyr::across(where(is.integer),as.numeric)) # temporary solution for treating integer as numeric
   
   interaction_term = get_interaction_term(model)
   
@@ -102,8 +119,8 @@ anova_plot <- function(model,
       numeric_var_count = data_type %>%
         dplyr::filter(.data$value == 'numeric') %>%
         nrow()
-      
-      if (numeric_var_count == 1) {
+      # 1 continuous & 1 categorical variable 
+      if (numeric_var_count == 1) { 
         num_var_name = data_type %>% dplyr::filter(.data$value == 'numeric') %>% dplyr::select('name') %>% dplyr::pull()
         cat_var_name = data_type %>% dplyr::filter(.data$value == 'factor') %>% dplyr::select('name') %>% dplyr::pull()
         
@@ -148,6 +165,7 @@ anova_plot <- function(model,
                                                 se = NA_real_))
           }
         }
+       
         names(plot_df)[1] = 'predict_var1'
         names(plot_df)[2] = 'predict_var2'
         
@@ -185,14 +203,6 @@ anova_plot <- function(model,
           predict_var3_name = NULL
         )
       }
-      
-      label_name = label_name(
-        graph_label_name = graph_label_name,
-        response_var_name = response_var_name,
-        predict_var1_name = predict_var1,
-        predict_var2_name = predict_var2,
-        predict_var3_name = NULL
-      )
       
       main_plot = plot_df %>%
         ggplot2::ggplot(data = .,

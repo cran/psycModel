@@ -2,10 +2,16 @@
 % Please edit documentation in R/cronbach_alpha.R
 \name{cronbach_alpha}
 \alias{cronbach_alpha}
-\title{Cronbach alpha
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}} \cr}
+\title{Cronbach alpha}
 \usage{
-cronbach_alpha(..., data, var_name, return_result = FALSE, group = NULL)
+cronbach_alpha(
+  ...,
+  data,
+  var_name,
+  group = NULL,
+  quite = FALSE,
+  return_result = FALSE
+)
 }
 \arguments{
 \item{...}{Items. Group each latent factors using c() with when computing Cronbach alpha for 2+ factors (see example below)}
@@ -14,14 +20,17 @@ cronbach_alpha(..., data, var_name, return_result = FALSE, group = NULL)
 
 \item{var_name}{character or a vector of characters. The order of \code{var_name} must be same as the order of the \code{...}}
 
-\item{return_result}{If it is set to \code{TRUE}, it will return a \code{dataframe} object}
-
 \item{group}{optional character. Specify this argument for computing Cronbach alpha for group separetely}
+
+\item{quite}{suppress printing output}
+
+\item{return_result}{If it is set to \code{TRUE}, it will return a \code{dataframe} object}
 }
 \value{
 a \code{data.frame} object if return_result is \code{TRUE}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}} \cr
 Computing the Cronbach alphas for multiple factors.
 }
 \examples{
