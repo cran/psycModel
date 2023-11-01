@@ -20,6 +20,8 @@
 #' @param y_lim the plot's upper and lower limit for the y-axis. Length of 2. Example: `c(lower_limit, upper_limit)`
 #' @param plot_color If it is set to `TRUE` (default is `FALSE`), the interaction plot will plot with color.
 #' @param use_package Default is `lmerTest`. Only available for linear mixed effect model. Options are `nlme`, `lmerTest`, or `lme4`(`'lme4` return similar result as `lmerTest` except the return model)
+#' @param standardize The method used for standardizing the parameters. Can be NULL (default; no standardization), "refit" (for re-fitting the model on standardized data) or one of "basic", "posthoc", "smart", "pseudo". See 'Details' in parameters::standardize_parameters()
+#' @param ci_method see options in the `Mixed model` section in ?parameters::model_parameters()
 #' @param quite suppress printing output
 #' @param digits number of digits to round to
 #' @param simple_slope Slope estimate at ± 1 SD and the mean of the moderator. Uses `interactions::sim_slope()` in the background.
@@ -67,6 +69,8 @@ lme_multilevel_model_summary <- function(data,
                                          plot_color = FALSE,
                                          digits = 3,
                                          use_package = "lmerTest",
+                                         standardize = NULL,
+                                         ci_method = 'satterthwaite',
                                          simple_slope = FALSE,
                                          assumption_plot = FALSE,
                                          quite = FALSE,
@@ -82,22 +86,22 @@ lme_multilevel_model_summary <- function(data,
   }
   
   response_variable <- data %>%
-    dplyr::select(!!enquo(response_variable)) %>%
+    tidyselect::eval_select(data = ., expr = enquo(response_variable),strict = TRUE) %>%
     names()
   random_effect_factors <- data %>%
-    dplyr::select(!!enquo(random_effect_factors)) %>%
+    tidyselect::eval_select(data = ., expr = enquo(random_effect_factors),strict = TRUE) %>%
     names()
   non_random_effect_factors <- data %>%
-    dplyr::select(!!enquo(non_random_effect_factors)) %>%
+    tidyselect::eval_select(data = ., expr = enquo(non_random_effect_factors),strict = TRUE) %>%
     names()
   two_way_interaction_factor <- data %>%
-    dplyr::select(!!enquo(two_way_interaction_factor)) %>%
+    tidyselect::eval_select(data = ., expr = enquo(two_way_interaction_factor),strict = TRUE) %>%
     names()
   three_way_interaction_factor <- data %>%
-    dplyr::select(!!enquo(three_way_interaction_factor)) %>%
+    tidyselect::eval_select(data = ., expr = enquo(three_way_interaction_factor),strict = TRUE) %>%
     names()
   id <- data %>%
-    dplyr::select(!!enquo(id)) %>%
+    tidyselect::eval_select(data = ., expr = enquo(id),strict = TRUE) %>%
     names()
   
   ##################################### Run Model #########################################
@@ -105,12 +109,12 @@ lme_multilevel_model_summary <- function(data,
     model <- lme_model(
       model = model,
       data = data,
-      response_variable = tidyselect::all_of(response_variable),
-      random_effect_factors = tidyselect::all_of(random_effect_factors),
-      non_random_effect_factors = tidyselect::all_of(non_random_effect_factors),
-      two_way_interaction_factor = tidyselect::all_of(two_way_interaction_factor),
-      three_way_interaction_factor = tidyselect::all_of(three_way_interaction_factor),
-      id = tidyselect::all_of(id),
+      response_variable = dplyr::all_of(response_variable),
+      random_effect_factors = dplyr::all_of(random_effect_factors),
+      non_random_effect_factors = dplyr::all_of(non_random_effect_factors),
+      two_way_interaction_factor = dplyr::all_of(two_way_interaction_factor),
+      three_way_interaction_factor = dplyr::all_of(three_way_interaction_factor),
+      id = dplyr::all_of(id),
       opt_control = opt_control,
       na.action = na.action,
       estimation_method = estimation_method,
@@ -126,13 +130,13 @@ lme_multilevel_model_summary <- function(data,
     # model <- glme_model(
     #   model = model,
     #   data = data,
-    #   response_variable = tidyselect::all_of(response_variable),
-    #   random_effect_factors = tidyselect::all_of(random_effect_factors),
-    #   non_random_effect_factors = tidyselect::all_of(non_random_effect_factors),
-    #   two_way_interaction_factor = tidyselect::all_of(two_way_interaction_factor),
-    #   three_way_interaction_factor = tidyselect::all_of(three_way_interaction_factor),
+    #   response_variable = dplyr::all_of(response_variable),
+    #   random_effect_factors = dplyr::all_of(random_effect_factors),
+    #   non_random_effect_factors = dplyr::all_of(non_random_effect_factors),
+    #   two_way_interaction_factor = dplyr::all_of(two_way_interaction_factor),
+    #   three_way_interaction_factor = dplyr::all_of(three_way_interaction_factor),
     #   family = family,
-    #   id = tidyselect::all_of(id),
+    #   id = dplyr::all_of(id),
     #   opt_control = opt_control,
     #   na.action = na.action,
     #   estimation_method = estimation_method,
@@ -144,10 +148,10 @@ lme_multilevel_model_summary <- function(data,
   
   ############################### Generate Interaction Plots ###############################
   two_way_interaction_factor <- data %>%
-    dplyr::select(!!enquo(two_way_interaction_factor)) %>%
+    tidyselect::eval_select(data = ., expr = enquo(two_way_interaction_factor),strict = TRUE) %>%
     names()
   three_way_interaction_factor <- data %>%
-    dplyr::select(!!enquo(three_way_interaction_factor)) %>%
+    tidyselect::eval_select(data = ., expr = enquo(three_way_interaction_factor),strict = TRUE) %>%
     names()
   interaction_plot_object <- NULL
   if (length(two_way_interaction_factor) != 0 &
@@ -187,6 +191,8 @@ lme_multilevel_model_summary <- function(data,
   if (model_summary == TRUE) {
     model_summary_list <- model_summary(
       model = model,
+      standardize = standardize,
+      ci_method = ci_method,
       streamline = streamline,
       digits = digits,
       return_result = TRUE,

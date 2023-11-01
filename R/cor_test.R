@@ -24,7 +24,7 @@ cor_test <- function(data,
                      ...,
                      digits = 3,
                      method = "pearson",
-                     p_adjust = "holm",
+                     p_adjust = "none",
                      streamline = FALSE,
                      quite = FALSE,
                      return_result = FALSE) {
@@ -59,7 +59,7 @@ cor_test <- function(data,
 
   cor_df <- tibble::tibble(Var = colnames(data)) %>%
     dplyr::full_join(cor_df, by = "Var") %>%
-    dplyr::mutate(dplyr::across(tidyselect::everything(), function(x) {
+    dplyr::mutate(dplyr::across(dplyr::everything(), function(x) {
       tidyr::replace_na(data = x, replace = "")
     }))
 
